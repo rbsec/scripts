@@ -7,15 +7,15 @@
 import re
 import sys
 
-wordlist = []
+wordlist = set()
 with open(sys.argv[1]) as f:
     lines = f.readlines()
 for line in lines:
     words = re.findall("[a-zA-Z0-9\-]+", line)
     for word in words:
-        wordlist.append(word)
+        wordlist.add(word)
 
-wordlist = sorted(set(wordlist), key=lambda s: s.lower())
+wordlist = sorted(wordlist, key=lambda s: s.lower())
 f = open("wordlist.txt", "w")
 for word in wordlist:
     f.write(word + "\n")
