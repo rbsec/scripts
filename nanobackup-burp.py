@@ -7,6 +7,7 @@
 import base64
 import re
 import sys
+import urlparse
 try:    # Use faster C implementation if we can
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -17,12 +18,10 @@ wordlist = set()
 for event, elem in ET.iterparse(sys.argv[1]):
     if event == 'end':
         if elem.tag == 'url':
-            url = str(elem.text)
-            try:
-                file = re.search("https?://[a-zA-Z0-9\-\.]+(.*?\.php)", url).group(1)
-                wordlist.add(file)
-            except:
-                pass
+            u = str(elem.text)
+            url = urlparse.urlsplit(u)
+            if url.path.endswith('php'):
+                wordlist.add(url.path)
     elem.clear() # Discard the element to free memory
 
 
