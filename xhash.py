@@ -66,6 +66,6 @@ with open(outfile, 'w') as out:
                     continue
                 seen.add(md5hash)
                 sha1hash = sha1(fpath).upper()
-                out.write('"' + sha1hash + '","' + md5hash + '","0000000000000000","' + f + '","'+str(size)+'","0","0"\n')
+                out.write('"' + sha1hash + '","' + md5hash + '","0000000000000000","' + f + '","'+str(size)+'","0","0",""\n')
                 hashcount += 1
     print("Wrote " + str(len(seen)) + " hashes to " + outfile + " in " + str(datetime.now() - start_time))
