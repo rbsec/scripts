@@ -3,14 +3,15 @@
 # Search for a file hash in a Git repo
 # Clones the git repo and steps through every commit checking if a file matches a hash
 # Intended to fingerprint website versions based on a public file (such as .js or .css)
-# Usage: $ ./vfinder.py <repo> <filepath> <MD5 hash>
+# Usage: $ ./vfinder.py <repo> <filepath>
 #
 import hashlib
 import os
 import subprocess
 import sys
 import time
-
+from urllib.request import urlopen
+from urllib.parse import urlparse
 from datetime import datetime
 
 def md5(fname):
@@ -27,13 +28,31 @@ def sha1(fname):
             hash_sha1.update(chunk)
     return hash_sha1.hexdigest()
 
-if len(sys.argv) < 4:
-    print("Usage: $ ./vfinder.py <repo> <filepath> <MD5 hash>")
+if len(sys.argv) < 3:
+    print("Usage: $ ./vfinder.py <repo> <filepath>")
     sys.exit(1)
 
 repo = sys.argv[1]
 filepath = sys.argv[2]
-filehash = sys.argv[3].upper()
+
+if os.path.isfile(filepath):
+    filehash = md5(filepath)
+else:
+    try:
+        o = urlparse(filepath)
+    except Exception as e:
+        print(e)
+        print("Inavlid URL")
+        sys.exit(1)
+    try:
+        page = urlopen(filepath).read()
+        print("Retrieved page " + filepath)
+        filepath = o.path.lstrip('/')
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+    filehash = hashlib.md5(page).hexdigest().upper()
+
 
 try:
     reponame = repo.rsplit('/',1)[1]
@@ -48,7 +67,7 @@ if not (os.path.isdir(reponame)):
 os.chdir(reponame)
 seen = set()
 tags = os.popen('git tag').readlines()
-print("Scanning for " + filepath + " in " + str(len(tags)) + " tags")
+print("Scanning for " + filepath + " (" + filehash + ") in " + str(len(tags)) + " tags")
 for tag in tags:
     ret = os.system('git checkout --quiet ' + tag)
     if ret != 0:
