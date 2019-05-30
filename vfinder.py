@@ -3,7 +3,8 @@
 # Search for a file hash in a Git repo
 # Clones the git repo and steps through every commit checking if a file matches a hash
 # Intended to fingerprint website versions based on a public file (such as .js or .css)
-# Usage: $ ./vfinder.py <repo> <filepath>
+# Usage: $ ./vfinder.py <repo> <url> [filepath]
+# Filepath is only needed if the URL path to the file doesn't match the URL path
 #
 import hashlib
 import os
@@ -22,25 +23,28 @@ def md5(fname):
     return hash_md5.hexdigest()
 
 if len(sys.argv) < 3:
-    print("Usage: $ ./vfinder.py <repo> <filepath>")
+    print("Usage: $ ./vfinder.py <repo> <url> [filepath]")
     sys.exit(1)
-
+if len(sys.argv) == 4:
+    filepath = sys.argv[3].lstrip('/')
 repo = sys.argv[1]
-filepath = sys.argv[2]
+url = sys.argv[2]
 
-if os.path.isfile(filepath):
-    filehash = md5(filepath)
+
+if os.path.isfile(url):
+    filehash = md5(url)
 else:
     try:
-        o = urlparse(filepath)
+        o = urlparse(url)
     except Exception as e:
         print(e)
         print("Inavlid URL")
         sys.exit(1)
     try:
-        page = urlopen(filepath).read()
-        print("Retrieved page " + filepath)
-        filepath = o.path.lstrip('/')
+        page = urlopen(url).read()
+        print("Retrieved page " + url)
+        if not filepath:
+            filepath = o.path.lstrip('/')
     except Exception as e:
         print(e)
         sys.exit(1)
