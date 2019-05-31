@@ -46,6 +46,8 @@ with open(outfile, 'w') as out:
     os.chdir(reponame)
     seen = set()
     tags = os.popen('git tag').readlines()
+    if len(tags) == 0:
+        tags.append('HEAD')
     out.write('"SHA-1","MD5","CRC32","FileName","FileSize","ProductCode","OpSystemCode","SpecialCode"\n')
     i = 1
     hashcount = 0
