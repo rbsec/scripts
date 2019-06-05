@@ -27,6 +27,8 @@ if len(sys.argv) < 3:
     sys.exit(1)
 if len(sys.argv) == 4:
     filepath = sys.argv[3].lstrip('/')
+else:
+    filepath = ""
 repo = sys.argv[1]
 url = sys.argv[2]
 
