@@ -68,7 +68,7 @@ seen = set()
 tags = os.popen('git tag').readlines()
 print("Scanning for " + filepath + " (" + filehash + ") in " + str(len(tags)) + " tags")
 for tag in tags:
-    ret = os.system('git checkout --quiet ' + tag)
+    ret = os.system('git checkout -f --quiet ' + tag)
     if ret != 0:
         sys.exit(1)
     if os.path.isfile(filepath):
